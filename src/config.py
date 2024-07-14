@@ -5,24 +5,44 @@ load_dotenv()
 
 def load_psql_config():
     return {
-        'host': os.getenv('DB_HOST'),
-        'user': os.getenv('DB_USER'),
-        'password': os.getenv('DB_PASSWORD'),
-        'dbname': os.getenv('DB_NAME'),
-        'port': os.getenv('DB_PORT')
+        'user': os.getenv('PSQL_USER'),
+        'password': os.getenv('PSQL_PASSWORD'),
+        'dbname': os.getenv('PSQL_DB'),
+        'port': os.getenv('PSQL_PORT'),
+        'host': os.getenv('PSQL_HOST')
     }
 
 def load_spark_config():
     return {
         'spark.driver.memory': '4g',
-        'spark.executor.memory': '4g',
+        'spark.executor.memory': '8g',
         'spark.executor.cores': '2',
-        'spark.driver.cores': '2',
-        'spark.sql.shuffle.partitions': '2'
+        'spark.driver.cores': '4',
     }
 
-def create_spark_session():
+def init_spark(session_name='myapp'):
     from pyspark.sql import SparkSession
-    spark = SparkSession.builder.appName("Sparkify")
+    config = load_spark_config()
+    spark = SparkSession.builder.appName(session_name)\
+        .getOrCreate()
+        # .config('spark.executor.memory', config['spark.executor.memory']
+        # ).config('spark.executor.cores', config['spark.executor.cores']
+        # ).config('spark.driver.memory', config['spark.driver.memory']
+        # ).config('spark.driver.cores', config['spark.driver.cores'])\
+        
     return spark
+
+def init_conn():
+    import duckdb
+
+    duckdb.execute("INSTALL postgres")
+    duckdb.execute("LOAD postgres")
+    duckdb.execute(f"ATTACH \
+                'dbname={load_psql_config()['dbname']}\
+                    user={load_psql_config()['user']}\
+                    password={load_psql_config()['password']}\
+                    host={load_psql_config()['host']}\
+                    port={load_psql_config()['port']}'\
+                        AS db (TYPE POSTGRES)\
+                ")
 
