@@ -5,11 +5,11 @@ load_dotenv()
 
 def load_psql_config():
     return {
-        'user': os.getenv('PSQL_USER'),
-        'password': os.getenv('PSQL_PASSWORD'),
-        'dbname': os.getenv('PSQL_DB'),
-        'port': os.getenv('PSQL_PORT'),
-        'host': os.getenv('PSQL_HOST')
+        'user': os.getenv('PG_USER'),
+        'password': os.getenv('PG_PW'),
+        'dbname': os.getenv('PG_DB'),
+        'port': os.getenv('PG_PORT'),
+        'host': os.getenv('PG_HOST')
     }
 
 def load_spark_config():
